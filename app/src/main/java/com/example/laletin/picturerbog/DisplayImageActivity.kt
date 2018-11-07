@@ -7,11 +7,10 @@ import kotlinx.android.synthetic.main.abc_activity_chooser_view.*
 import kotlinx.android.synthetic.main.abc_dialog_title_material.view.*
 import kotlinx.android.synthetic.main.content_main.*
 
-
 class DisplayImageActivity : AppCompatActivity(), FragmentWithText.FragmentWithTextListener {
 
-    var title : String = ""
-    var url : String = ""
+    var title: String = ""
+    var url: String = ""
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -61,7 +60,7 @@ class DisplayImageActivity : AppCompatActivity(), FragmentWithText.FragmentWithT
     }
 
 
-    override fun onCreate(savedInstanceState:Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.content_main)
 

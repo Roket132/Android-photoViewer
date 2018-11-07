@@ -14,7 +14,7 @@ class LruCacheOgject {
     }
 }
 
-class LruCache(maxSize: Int) :  LruCache<String, Bitmap>(maxSize){
+class LruCache(maxSize: Int) : LruCache<String, Bitmap>(maxSize) {
     fun getBitmapFromMemory(key: String): Bitmap? {
         return this.get(key)
     }
@@ -25,25 +25,4 @@ class LruCache(maxSize: Int) :  LruCache<String, Bitmap>(maxSize){
             Log.d("TEST", "$key добавлен в кэш")
         }
     }
-}
-
-fun drawableToBitmap(drawable: Drawable): Bitmap? {
-    var bitmap: Bitmap? = null
-
-    if (drawable is BitmapDrawable) {
-        if (drawable.bitmap != null) {
-            return drawable.bitmap
-        }
-    }
-
-    if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
-        bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // Single color bitmap will be created of 1x1 pixel
-    } else {
-        bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-    }
-
-    val canvas = Canvas(bitmap)
-    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
-    drawable.draw(canvas)
-    return bitmap
 }

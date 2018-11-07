@@ -11,7 +11,7 @@ class CacheForPreview {
     }
 }
 
-class LruCacheF(maxSize: Int) :  LruCache<String, Bitmap>(maxSize){
+class LruCacheF(maxSize: Int) : LruCache<String, Bitmap>(maxSize) {
     fun getBitmapFromMemory(key: String): Bitmap? {
         return this.get(key)
     }

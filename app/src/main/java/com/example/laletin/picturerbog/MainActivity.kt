@@ -1,12 +1,9 @@
 package com.example.laletin.picturerbog
 
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.lang.ref.WeakReference
 
@@ -15,14 +12,13 @@ import java.util.regex.Pattern
 
 class MainActivity : AppCompatActivity() {
 
-    class DownloadPreview(ctx: MainActivity) : AsyncTask<Void, Void, Void?>() {
+    class DownloadPreview(ctx: MainActivity) : AsyncTask<Void, Void, JSONImages?>() {
 
-        private var resultImages = ArrayList<Images>()
         private val contextRef: WeakReference<MainActivity>? = WeakReference(ctx)
 
-        override fun doInBackground(vararg params: Void): Void? {
+        override fun doInBackground(vararg params: Void): JSONImages? {
             try {
-                //todo создать list
+                //todo создать json
                 /**
                  * flickr.interestingness.getList
                  * flickr.photos.search
@@ -34,59 +30,27 @@ class MainActivity : AppCompatActivity() {
                         }
                 val result = deserialize(response)
                 val mapper = ObjectMapper()
-                val images: JSONImages = mapper.readValue(result, JSONImages::class.java)
-
-                for (i in 0 until 50) {
-                    if (isCancelled)
-                        return null
-                    val urldisplay = images.photos?.photo?.get(i)?.url_s
-                    var mIcon11: Bitmap? = null
-                    if (CacheForPreview.Cache.get(urldisplay) == null) {
-                        try {
-                            val `in` = java.net.URL(urldisplay).openStream()
-                            mIcon11 = BitmapFactory.decodeStream(`in`)
-                            urldisplay?.let {
-                                if (mIcon11 != null) {
-                                    CacheForPreview.Cache.setBitmapToMemory(it, mIcon11!!)
-                                }
-                            }
-                        } catch (e: Exception) {
-                            Log.e("Error", e.message)
-                            e.printStackTrace()
-                        }
-                    } else {
-                        mIcon11 = CacheForPreview.Cache.get(urldisplay);
-                    }
-                    val url_s = mIcon11!!
-                    val id = images.photos?.photo?.get(i)?.id ?: "228"
-                    val title = images.photos?.photo?.get(i)?.title ?: "ojvp"
-                    //fixme ojvp???
-                    val url_m = images.photos?.photo?.get(i)?.url_m ?: "ojvp"
-                    val url_l = images.photos?.photo?.get(i)?.url_l ?: urldisplay ?: "ojvp"
-                    resultImages.add(Images(id, title, url_s, url_l, null))
-                }
+                return mapper.readValue(result, JSONImages::class.java)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-
             return null
         }
 
-        override fun onPostExecute(result: Void?) {
+        override fun onPostExecute(result: JSONImages?) {
             super.onPostExecute(result)
-            ImagesHolder.iamgesList = resultImages
+            ImagesHolder.json = result
             val ctx = contextRef?.get()
             ctx?.setContentView(R.layout.activity_main)
         }
 
-        protected fun deserialize(responseString: String): String? {
+        private fun deserialize(responseString: String): String? {
             val p = Pattern.compile(".*?\\((.*)\\)$")
             val m = p.matcher(responseString)
             var json: String? = null
             if (m.matches()) {
                 json = m.group(1)
             }
-
             return json
         }
     }
