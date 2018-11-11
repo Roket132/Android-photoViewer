@@ -10,7 +10,7 @@ import android.widget.Toast
 import java.lang.ref.WeakReference
 
 
-class DownloadImageService : Service() {
+class DownloadImageService : Service(), OnTaskCompleted {
 
     private val mBinder = LocalBinder()
     private var mServiceIsStarted: Boolean = false
@@ -20,9 +20,15 @@ class DownloadImageService : Service() {
     fun downloadImage(mode: Int, index: Int, imageL: ImageList,
                       activity: WeakReference<FragmentActivity?>?, ctx: WeakReference<Context>?) {
 
-        val start = DownloadImageTask(index, imageL, activity, ctx)
+        val start = DownloadImageTask(index, imageL, activity, ctx, this)
         start.execute(mode)
+
     }
+
+    override fun onTaskCompleted() {
+        stopSelf(startId)
+    }
+
 
     inner class LocalBinder : Binder() {
         internal// Return this instance of LocalService so clients can call public methods
@@ -39,5 +45,9 @@ class DownloadImageService : Service() {
         this.startId = startId
 
         return Service.START_STICKY
+    }
+
+    override fun onDestroy() {
+        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
 }

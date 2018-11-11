@@ -8,9 +8,16 @@ import android.support.v4.app.FragmentActivity
 import android.util.Log
 import java.lang.ref.WeakReference
 
+
+interface OnTaskCompleted {
+    fun onTaskCompleted()
+}
+
+
 class DownloadImageTask(val index: Int, private val imageL: ImageList,
                         private val activityRef: WeakReference<FragmentActivity?>?,
-                        private val contextRef: WeakReference<Context>?) : AsyncTask<Int, Void, Int>() {
+                        private val contextRef: WeakReference<Context>?,
+                        private var listener: OnTaskCompleted) : AsyncTask<Int, Void, Int>() {
 
     private lateinit var image: Images
 
@@ -45,13 +52,14 @@ class DownloadImageTask(val index: Int, private val imageL: ImageList,
                 val ctx = contextRef?.get()
                 imageL.startActivity(ctx?.createUserIntent(image))
             } else if (mode == 2) {
-                val activity = activityRef!!.get()
-                val transaction = activity!!.supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.fragment_content, ImageDetailsFragment.newInstance(image))
-                transaction.commit()
+                val activity = activityRef?.get()
+                val transaction = activity?.supportFragmentManager?.beginTransaction()
+                transaction?.replace(R.id.fragment_content, ImageDetailsFragment.newInstance(image))
+                transaction?.commit()
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        listener.onTaskCompleted()
     }
 }
