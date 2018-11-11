@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 
 class MainActivity : AppCompatActivity() {
 
-    class DownloadPreview(ctx: MainActivity) : AsyncTask<Void, Void, JSONImages?>() {
+    class DownloadJSON(ctx: MainActivity) : AsyncTask<Void, Void, JSONImages?>() {
 
         private val contextRef: WeakReference<MainActivity>? = WeakReference(ctx)
 
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onPostExecute(result: JSONImages?) {
             super.onPostExecute(result)
-            ImagesHolder.json = result
+            JSONHolder.json = result
             val ctx = contextRef?.get()
             ctx?.setContentView(R.layout.activity_main)
         }
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    val start = DownloadPreview(this)
+    val start = DownloadJSON(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

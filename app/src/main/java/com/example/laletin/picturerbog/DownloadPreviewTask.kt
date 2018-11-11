@@ -15,7 +15,7 @@ class DownloadPreviewTask(private val holder: ImageViewHolder) : AsyncTask<Int, 
     override fun doInBackground(vararg params: Int?): Pair<Bitmap?, String?>? {
         try {
             val index = params[0] ?: return null
-            val url_s = ImagesHolder.json?.photos?.photo?.get(index)?.url_s
+            val url_s = JSONHolder.json?.photos?.photo?.get(index)?.url_s
             var mIcon11: Bitmap? = null
 
             if (CacheForPreview.Cache.get(url_s) == null) {
@@ -34,7 +34,7 @@ class DownloadPreviewTask(private val holder: ImageViewHolder) : AsyncTask<Int, 
             } else {
                 mIcon11 = CacheForPreview.Cache.get(url_s)
             }
-            return Pair(mIcon11, ImagesHolder.json?.photos?.photo?.get(index)?.title)
+            return Pair(mIcon11, JSONHolder.json?.photos?.photo?.get(index)?.title)
         } catch (e: Exception) {
             e.printStackTrace()
         }

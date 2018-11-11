@@ -54,5 +54,4 @@ class UsersRecycler(private val onItemClicked: (index: Int) -> Unit) :
     override fun onBindViewHolder(holder: ImageViewHolder, index: Int) {
         DownloadPreviewTask(holder).execute(index)
     }
-
 }

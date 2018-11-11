@@ -31,7 +31,7 @@
         </activity>
         <activity android:name=".DisplayImageActivity" />
 
-        <service android:name=".ServisForEverything" />
+        <service android:name=".DownloadImageService" />
     </application>
 
 </manifest>

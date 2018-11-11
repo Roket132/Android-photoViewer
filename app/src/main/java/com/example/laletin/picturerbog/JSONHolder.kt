@@ -1,6 +1,6 @@
 package com.example.laletin.picturerbog
 
-class ImagesHolder {
+class JSONHolder {
     companion object {
         var json: JSONImages? = null
     }
