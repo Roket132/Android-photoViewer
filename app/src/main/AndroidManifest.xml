@@ -30,8 +30,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisplayImageActivity" />
-
         <service android:name=".DownloadImageService" />
+        <service android:name=".DownloadPreviewService" />
+
     </application>
 
 </manifest>

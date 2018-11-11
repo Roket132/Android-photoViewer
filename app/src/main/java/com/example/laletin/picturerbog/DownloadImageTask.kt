@@ -23,7 +23,7 @@ class DownloadImageTask(val index: Int, private val imageL: ImageList,
 
     override fun doInBackground(vararg params: Int?): Int {
         try {
-            val url_l = JSONHolder.json?.photos?.photo?.get(index)?.url_l!!
+            val url_l = JSONHolder().get()?.photos?.photo?.get(index)?.url_l!!
             if (LruCacheOgject.Cache.get(url_l) == null) {
                 var mIcon11: Bitmap? = null
 
@@ -38,7 +38,7 @@ class DownloadImageTask(val index: Int, private val imageL: ImageList,
                     LruCacheOgject.Cache.setBitmapToMemory(url_l, mIcon11)
                 }
             }
-            val title = JSONHolder.json?.photos?.photo?.get(index)?.title ?: "hello"
+            val title = JSONHolder().get()?.photos?.photo?.get(index)?.title ?: "hello"
             image = Images("0", title, url_l)
         } catch (e: InterruptedException) {
             e.printStackTrace()

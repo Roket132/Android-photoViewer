@@ -10,8 +10,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import kotlinx.android.parcel.Parcelize
 
-
 import kotlinx.android.synthetic.main.image_item.view.*
+
 
 @Parcelize
 data class Images(val id: String, val title: String, val url_l: String) : Parcelable
@@ -19,7 +19,7 @@ data class Images(val id: String, val title: String, val url_l: String) : Parcel
 
 fun RecyclerView.setupForUsers(ctx: Context, onItemClicked: (index: Int) -> Unit = {}) {
     layoutManager = LinearLayoutManager(ctx)
-    adapter = UsersRecycler(onItemClicked)
+    adapter = UsersRecycler(context!!, onItemClicked)
     setHasFixedSize(true)
 
 }
@@ -30,13 +30,12 @@ fun Context.createUserIntent(image: Images): Intent {
     return intent
 }
 
-
 class ImageViewHolder(val frame: FrameLayout) : RecyclerView.ViewHolder(frame) {
     var image = frame.image_item!!
     var description = frame.description!!
 }
 
-class UsersRecycler(private val onItemClicked: (index: Int) -> Unit) :
+class UsersRecycler(private val ctx: Context, private val onItemClicked: (index: Int) -> Unit) :
         RecyclerView.Adapter<ImageViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int) =
             ImageViewHolder(
@@ -49,9 +48,10 @@ class UsersRecycler(private val onItemClicked: (index: Int) -> Unit) :
                 frame.setOnClickListener { onItemClicked(adapterPosition) }
             }
 
-    override fun getItemCount() = 50
+    override fun getItemCount() = 100
 
     override fun onBindViewHolder(holder: ImageViewHolder, index: Int) {
         DownloadPreviewTask(holder).execute(index)
     }
+
 }
