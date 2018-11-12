@@ -25,7 +25,7 @@ class DownloadImageService : Service(), OnTaskCompleted {
     }
 
     override fun onTaskCompleted() {
-        //stopSelf(startId)
+        stopSelf(startId)
     }
 
 
@@ -47,6 +47,6 @@ class DownloadImageService : Service(), OnTaskCompleted {
     }
 
     override fun onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "loaded", Toast.LENGTH_SHORT).show()
     }
 }
