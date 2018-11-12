@@ -24,7 +24,7 @@ class DownloadImageTask(val index: Int, private val imageL: ImageList,
     override fun doInBackground(vararg params: Int?): Int {
         try {
             val url_l = JSONHolder().get()?.photos?.photo?.get(index)?.url_l!!
-            if (LruCacheOgject.Cache.get(url_l) == null) {
+            if (CacheImages.cache.get(url_l) == null) {
                 var mIcon11: Bitmap? = null
 
                 try {
@@ -35,7 +35,7 @@ class DownloadImageTask(val index: Int, private val imageL: ImageList,
                     e.printStackTrace()
                 }
                 if (mIcon11 != null) {
-                    LruCacheOgject.Cache.setBitmapToMemory(url_l, mIcon11)
+                    CacheImages.cache.setBitmapToMemory(url_l, mIcon11)
                 }
             }
             val title = JSONHolder().get()?.photos?.photo?.get(index)?.title ?: "hello"

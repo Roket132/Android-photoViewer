@@ -31,7 +31,7 @@ class ImageDetailsFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.content, container, false).apply { ->
-        val url_sImage = image?.url_l?.let { LruCacheOgject.Cache.getBitmapFromMemory(it) }
+        val url_sImage = image?.url_l?.let { CacheImages.cache.getBitmapFromMemory(it) }
         imageView.setImageBitmap(url_sImage)
     }
 

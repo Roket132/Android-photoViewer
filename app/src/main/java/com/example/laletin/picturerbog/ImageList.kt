@@ -71,6 +71,13 @@ class ImageList : Fragment() {
 
         override fun onServiceDisconnected(arg0: ComponentName) {
             mBound = false
+
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val intent = Intent(context!!, DownloadImageService::class.java)
+        context!!.stopService(intent)
     }
 }

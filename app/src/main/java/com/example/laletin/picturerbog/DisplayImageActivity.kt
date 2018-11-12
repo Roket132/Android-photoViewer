@@ -59,7 +59,6 @@ class DisplayImageActivity : AppCompatActivity(), FragmentWithText.FragmentWithT
         popOtherIfPresent()
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.content_main)

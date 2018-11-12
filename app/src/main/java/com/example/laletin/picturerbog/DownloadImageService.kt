@@ -16,7 +16,6 @@ class DownloadImageService : Service(), OnTaskCompleted {
     private var mServiceIsStarted: Boolean = false
     private var startId: Int = 0
 
-
     fun downloadImage(mode: Int, index: Int, imageL: ImageList,
                       activity: WeakReference<FragmentActivity?>?, ctx: WeakReference<Context>?) {
 
@@ -26,7 +25,7 @@ class DownloadImageService : Service(), OnTaskCompleted {
     }
 
     override fun onTaskCompleted() {
-        stopSelf(startId)
+        //stopSelf(startId)
     }
 
 
@@ -48,6 +47,6 @@ class DownloadImageService : Service(), OnTaskCompleted {
     }
 
     override fun onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
     }
 }
