@@ -1,6 +1,7 @@
 package com.example.laletin.picturerbog
 
 import android.os.Bundle
+import AsyncLoad;
 import android.support.v7.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -9,8 +10,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        cacheImages.onLoad()
-        val str = fileList()
+        AsyncLoad(cacheImages).execute()
         setContentView(R.layout.activity_main)
     }
 

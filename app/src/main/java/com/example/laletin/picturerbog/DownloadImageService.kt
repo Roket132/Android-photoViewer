@@ -46,7 +46,4 @@ class DownloadImageService : Service(), OnTaskCompleted {
         return Service.START_STICKY
     }
 
-    override fun onDestroy() {
-        Toast.makeText(this, "loaded", Toast.LENGTH_SHORT).show()
-    }
 }
