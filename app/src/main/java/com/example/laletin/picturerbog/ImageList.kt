@@ -29,30 +29,34 @@ class ImageList : Fragment() {
     private var activityRef: WeakReference<FragmentActivity?>? = null// WeakReference(activity)
     private var indexServerConnection: Int = 0
 
+    private var cnt = false
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.image_list_fragment, container, false).also { inflatedView ->
         inflatedView.image_list_fragment.setupForUsers(context!!) { index ->
-
-            contextRef = WeakReference(context!!)
-            indexServerConnection = index
-            if (activity?.findViewById<View>(R.id.fragment_content) != null) {
-                modeServerConnection = 2
-                activityRef = WeakReference(activity)
-            } else {
-                modeServerConnection = 1
-            }
-
-            try {
-                if (!mBound) {
-                    val intent = Intent(context!!, DownloadImageService::class.java)
-                    context!!.bindService(intent, DownloadImageConnection, 0)
-                    context!!.startService(intent)
+            if (!cnt) {
+                contextRef = WeakReference(context!!)
+                indexServerConnection = index
+                if (activity?.findViewById<View>(R.id.fragment_content) != null) {
+                    modeServerConnection = 2
+                    activityRef = WeakReference(activity)
                 } else {
-                    mService?.downloadImage(modeServerConnection, index, this, activityRef, contextRef)
+                    modeServerConnection = 1
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
+
+                try {
+                    cnt = true
+                    if (!mBound) {
+                        val intent = Intent(context!!, DownloadImageService::class.java)
+                        context!!.bindService(intent, DownloadImageConnection, 0)
+                        context!!.startService(intent)
+                    } else {
+                        mService?.downloadImage(modeServerConnection, index, this, activityRef, contextRef)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
 
         }
@@ -71,7 +75,7 @@ class ImageList : Fragment() {
 
         override fun onServiceDisconnected(arg0: ComponentName) {
             mBound = false
-
+            cnt = false
         }
     }
 
