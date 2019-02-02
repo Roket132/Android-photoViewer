@@ -70,7 +70,7 @@ class DisplayImageActivity : AppCompatActivity(), FragmentWithText.FragmentWithT
             commit()
         }
         title = image.title
-        url = image.url_l
+        url = image.urlL
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
 }

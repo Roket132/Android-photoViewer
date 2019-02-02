@@ -55,15 +55,11 @@ class Photo {
     @JsonProperty("url_s")
     @get:JsonProperty("url_s")
     @set:JsonProperty("url_s")
-    var url_s: String? = null
-    @JsonProperty("url_m")
-    @get:JsonProperty("url_m")
-    @set:JsonProperty("url_m")
-    var url_m: String? = null
+    var urlS: String? = null
     @JsonProperty("url_l")
     @get:JsonProperty("url_l")
     @set:JsonProperty("url_l")
-    var url_l: String? = null
+    var urlL: String? = null
     @JsonProperty("title")
     @get:JsonProperty("title")
     @set:JsonProperty("title")

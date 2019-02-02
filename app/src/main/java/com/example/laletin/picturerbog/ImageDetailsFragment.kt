@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.content.view.*
 
 
@@ -31,8 +32,13 @@ class ImageDetailsFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.content, container, false).apply { ->
-        val url_sImage = image?.url_l?.let { CacheImages.cache.getBitmapFromMemory(it) }
-        imageView.setImageBitmap(url_sImage)
+        Picasso.with(context)
+                .load(image?.urlL)
+                .placeholder(R.drawable.ic_home_black_24dp)
+                .error(R.drawable.ic_home_black_24dp)
+                .into(imageView)
+        /*val url_sImage = image?.url_l?.let { CacheImages.cache.getBitmapFromMemory(it) }
+        imageView.setImageBitmap(url_sImage)*/
     }
 
 
