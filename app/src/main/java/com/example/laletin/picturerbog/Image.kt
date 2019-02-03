@@ -6,10 +6,8 @@ import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ListAdapter
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.squareup.picasso.Picasso
 import kotlinx.android.parcel.Parcelize
@@ -19,15 +17,15 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.regex.Pattern
-import kotlin.coroutines.experimental.coroutineContext
 
 
 @Parcelize
-data class Images(val id: String, val title: String, val urlL: String) : Parcelable
+data class Images(val id: String, val title: String, val urlS: String, val urlL: String) : Parcelable
 
-var adapter_ : RecyclerView.Adapter<*>? = null
-var userQuerty : String = "ivan kayukoff"
-var needUpdate = false
+var adapter_: RecyclerView.Adapter<*>? = null
+var userQuerty: String = "ivan kayukoff"
+var fromDatabase = false
+var favoritesList: List<ImageEntity>? = null
 
 /**
  * Этот метод форматирует response от моего API
@@ -42,7 +40,17 @@ private fun deserialize(responseString: String): String? {
     return json
 }
 
+fun makeFavorites() {
+    fromDatabase = true
+    val db = App.instance.database
+    val imageDao = db?.imageDao()
+
+    favoritesList = imageDao?.getAll()
+    adapter_?.notifyDataSetChanged()
+}
+
 fun makeSearch(str: String) {
+    fromDatabase = false
     userQuerty = str
     NetworkService.instance
             .jsonApi
@@ -51,6 +59,7 @@ fun makeSearch(str: String) {
                 override fun onFailure(call: Call<String>?, t: Throwable?) {
                     t?.printStackTrace()
                 }
+
                 override fun onResponse(call: Call<String>?, response: Response<String>?) {
                     /**
                      * Пришлось response принимать строкой, а потом её парсить в json.
@@ -61,7 +70,7 @@ fun makeSearch(str: String) {
                      */
                     val result = deserialize(response?.body()!!)
                     val mapper = ObjectMapper()
-                    val json : JSONImages =  mapper.readValue(result, JSONImages::class.java)
+                    val json: JSONImages = mapper.readValue(result, JSONImages::class.java)
                     JSONHolder().setJSON(json)
                     adapter_?.notifyDataSetChanged()
                 }
@@ -99,7 +108,9 @@ class UsersRecycler(private val ctx: Context, private val onItemClicked: (index:
                 frame.setOnClickListener { onItemClicked(adapterPosition) }
             }
 
-    override fun getItemCount(): Int = JSONHolder().get()?.photos?.photo?.size?: 0
+    override fun getItemCount(): Int = if (fromDatabase) favoritesList?.size ?: 0
+    else
+        JSONHolder().get()?.photos?.photo?.size ?: 0
 
     override fun onBindViewHolder(holder: ImageViewHolder, index: Int) {
         holder.image.setImageResource(R.drawable.ic_home_black_24dp)
@@ -108,15 +119,24 @@ class UsersRecycler(private val ctx: Context, private val onItemClicked: (index:
 
     private fun setPreviewOnHolder(holder: ImageViewHolder, index: Int) {
         try {
-            holder.description.text = JSONHolder().get()?.photos?.photo?.get(index)?.title
+            val title: String?
+            val url: String?
+             if (!fromDatabase) {
+                 title = JSONHolder().get()?.photos?.photo?.get(index)?.title
+                 url = JSONHolder().get()?.photos?.photo?.get(index)?.urlS
+             } else {
+                 title = favoritesList?.get(index)?.title
+                 url = favoritesList?.get(index)?.urlS
+             }
+
+            holder.description.text = title
             Picasso.with(ctx)
-                    .load(JSONHolder().get()?.photos?.photo?.get(index)?.urlS)
+                    .load(url)
                     .placeholder(R.drawable.ic_home_black_24dp)
                     .error(R.drawable.ic_home_black_24dp)
                     .into(holder.image)
-        } catch (e : Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 }
-

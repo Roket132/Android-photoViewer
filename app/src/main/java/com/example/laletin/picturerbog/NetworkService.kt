@@ -7,7 +7,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.Gson
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
-
 class NetworkService private constructor() {
     private val mRetrofit: Retrofit
 

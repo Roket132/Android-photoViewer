@@ -5,9 +5,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.laletin.picturerbog.R.string.*
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.content.view.*
-
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "image"
@@ -19,7 +19,7 @@ private const val ARG_PARAM1 = "image"
  *
  */
 class ImageDetailsFragment : Fragment() {
-    private var image: Images? = null
+    private lateinit var image: Images
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,10 +33,49 @@ class ImageDetailsFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.content, container, false).apply { ->
         Picasso.with(context)
-                .load(image?.urlL)
+                .load(image.urlL)
                 .placeholder(R.drawable.ic_home_black_24dp)
                 .error(R.drawable.ic_home_black_24dp)
                 .into(imageView)
+
+        val id = image.id.toLong()
+
+        val db = App.instance.database
+        val dao = db?.imageDao()
+        val imageById = dao?.getById(id)
+
+        if (imageById == null) {
+            addFavor.text = resources.getString(add_to_favorites)
+        } else {
+            addFavor.text = resources.getString(remove_from_favorites)
+        }
+
+        addFavor.setOnClickListener {
+            if (addFavor.text == resources.getString(add_to_favorites)) {
+                addFavor.text = resources.getString(remove_from_favorites)
+
+                val db = App.instance.database
+                val imageDao = db?.imageDao()
+                val imageSQL = ImageEntity()
+                imageSQL.id = image.id.toLong()
+                imageSQL.title = image.title
+                imageSQL.urlS = image.urlS
+                imageSQL.urlL = image.urlL
+
+                imageDao?.delete(imageSQL)
+                imageDao?.insert(imageSQL)
+            } else {
+                addFavor.text = resources.getString(add_to_favorites)
+
+                val db = App.instance.database
+                val imageDao = db?.imageDao()
+                val imageSQL = ImageEntity()
+                imageSQL.id = image.id.toLong()
+
+                imageDao?.delete(imageSQL)
+            }
+        }
+
     }
 
 

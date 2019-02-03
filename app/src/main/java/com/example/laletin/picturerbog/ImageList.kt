@@ -10,17 +10,31 @@ import kotlinx.android.synthetic.main.image_list_fragment.*
 import kotlinx.android.synthetic.main.image_list_fragment.view.*
 
 class ImageList : Fragment() {
-
-    var querty: String = ""
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.image_list_fragment, container, false).also { inflatedView ->
         inflatedView.image_list_fragment.setupForUsers(context!!) { index ->
             try {
-                val title = JSONHolder().get()?.photos?.photo?.get(index)?.title
-                val urlL = JSONHolder().get()?.photos?.photo?.get(index)?.urlL?: JSONHolder().get()?.photos?.photo?.get(index)?.urlS
-                val image: Images = Images(index.toString(), title!!, urlL!!)
+                val title: String?
+                val urlS: String?
+                val urlL: String?
+                val id: String?
+                if (!fromDatabase) {
+                    title = JSONHolder().get()?.photos?.photo?.get(index)?.title
+                    urlS = JSONHolder().get()?.photos?.photo?.get(index)?.urlS
+                    urlL = JSONHolder().get()?.photos?.photo?.get(index)?.urlL
+                            ?: JSONHolder().get()?.photos?.photo?.get(index)?.urlS
+                    id = JSONHolder().get()?.photos?.photo?.get(index)?.id
+                } else {
+                    val db = App.instance.database
+                    val imageDao = db?.imageDao()
+                    val favoritesList = imageDao?.getAll()
+                    id = favoritesList?.get(index)?.id?.toString()
+                    title = favoritesList?.get(index)?.title
+                    urlS = favoritesList?.get(index)?.urlS
+                    urlL = favoritesList?.get(index)?.urlL
+                }
+                val image = Images(id.toString(), title!!, urlS!!, urlL!!)
                 if (activity?.findViewById<View>(R.id.fragment_content) != null) {
                     val transaction = activity!!.supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.fragment_content, ImageDetailsFragment.newInstance(image))
@@ -44,5 +58,9 @@ class ImageList : Fragment() {
             }
             false
         })
+
+        favorites.setOnClickListener {
+            makeFavorites()
+        }
     }
 }
