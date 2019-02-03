@@ -3,14 +3,13 @@ package com.example.laletin.picturerbog;
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
-import kotlinx.android.synthetic.main.abc_activity_chooser_view.*
-import kotlinx.android.synthetic.main.abc_dialog_title_material.view.*
 import kotlinx.android.synthetic.main.content_main.*
 
 class DisplayImageActivity : AppCompatActivity(), FragmentWithText.FragmentWithTextListener {
 
-    var title: String = ""
-    var url: String = ""
+    private var id: Long = 0
+    private var title: String = ""
+    private var url: String = ""
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -69,8 +68,9 @@ class DisplayImageActivity : AppCompatActivity(), FragmentWithText.FragmentWithT
             replace(R.id.detail_view_activity_frame, ImageDetailsFragment.newInstance(image), "TAG_HOME")
             commit()
         }
+        id = image.id.toLong()
         title = image.title
-        url = image.url_l
+        url = image.urlL
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
 }

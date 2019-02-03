@@ -10,7 +10,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:name=".App"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -30,8 +32,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisplayImageActivity" />
-        <service android:name=".DownloadImageService" />
-        <service android:name=".DownloadPreviewService" />
 
     </application>
 

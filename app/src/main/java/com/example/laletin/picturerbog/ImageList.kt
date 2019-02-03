@@ -1,82 +1,66 @@
 package com.example.laletin.picturerbog
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.android.synthetic.main.image_list_fragment.*
 import kotlinx.android.synthetic.main.image_list_fragment.view.*
-import android.os.AsyncTask
-import android.os.IBinder
-import android.support.v4.app.FragmentActivity
-import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import java.lang.ref.WeakReference
-
 
 class ImageList : Fragment() {
-
-    private var mService: DownloadImageService? = null
-    private var mBound = false
-    private var modeServerConnection = 0
-    private var contextRef: WeakReference<Context>? = null//  WeakReference(ctx)
-    private var activityRef: WeakReference<FragmentActivity?>? = null// WeakReference(activity)
-    private var indexServerConnection: Int = 0
-
-    private var cnt = false
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.image_list_fragment, container, false).also { inflatedView ->
         inflatedView.image_list_fragment.setupForUsers(context!!) { index ->
-            if (!cnt) {
-                contextRef = WeakReference(context!!)
-                indexServerConnection = index
-                if (activity?.findViewById<View>(R.id.fragment_content) != null) {
-                    modeServerConnection = 2
-                    activityRef = WeakReference(activity)
+            try {
+                val title: String?
+                val urlS: String?
+                val urlL: String?
+                val id: String?
+                if (!fromDatabase) {
+                    title = JSONHolder().get()?.photos?.photo?.get(index)?.title
+                    urlS = JSONHolder().get()?.photos?.photo?.get(index)?.urlS
+                    urlL = JSONHolder().get()?.photos?.photo?.get(index)?.urlL
+                            ?: JSONHolder().get()?.photos?.photo?.get(index)?.urlS
+                    id = JSONHolder().get()?.photos?.photo?.get(index)?.id
                 } else {
-                    modeServerConnection = 1
+                    val db = App.instance.database
+                    val imageDao = db?.imageDao()
+                    val favoritesList = imageDao?.getAll()
+                    id = favoritesList?.get(index)?.id?.toString()
+                    title = favoritesList?.get(index)?.title
+                    urlS = favoritesList?.get(index)?.urlS
+                    urlL = favoritesList?.get(index)?.urlL
                 }
-
-                try {
-                    cnt = true
-                    if (!mBound) {
-                        val intent = Intent(context!!, DownloadImageService::class.java)
-                        context!!.bindService(intent, DownloadImageConnection, 0)
-                        context!!.startService(intent)
-                    } else {
-                        mService?.downloadImage(modeServerConnection, index, this, activityRef, contextRef)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                val image = Images(id.toString(), title!!, urlS!!, urlL!!)
+                if (activity?.findViewById<View>(R.id.fragment_content) != null) {
+                    val transaction = activity!!.supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fragment_content, ImageDetailsFragment.newInstance(image))
+                    transaction.commit()
+                } else {
+                    startActivity(context!!.createUserIntent(image))
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-
         }
     }
 
-    private val DownloadImageConnection = object : ServiceConnection {
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
-        override fun onServiceConnected(className: ComponentName,
-                                        service: IBinder) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            val binder = service as DownloadImageService.LocalBinder
-            mService = binder.service
-            mService!!.downloadImage(modeServerConnection, indexServerConnection, this@ImageList, activityRef, contextRef)
-            mBound = true
-        }
+        textQuery.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                makeSearch(textQuery.text.toString())
+                return@OnKeyListener true
+            }
+            false
+        })
 
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-            cnt = false
+        favorites.setOnClickListener {
+            makeFavorites()
         }
     }
-
 }

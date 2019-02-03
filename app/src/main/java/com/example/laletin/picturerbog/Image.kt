@@ -8,20 +8,80 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.squareup.picasso.Picasso
 import kotlinx.android.parcel.Parcelize
 
 import kotlinx.android.synthetic.main.image_item.view.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.regex.Pattern
 
 
 @Parcelize
-data class Images(val id: String, val title: String, val url_l: String) : Parcelable
+data class Images(val id: String, val title: String, val urlS: String, val urlL: String) : Parcelable
 
+var adapter_: RecyclerView.Adapter<*>? = null
+var userQuerty: String = "ivan kayukoff"
+var fromDatabase = false
+var favoritesList: List<ImageEntity>? = null
+
+/**
+ * Этот метод форматирует response от моего API
+ */
+private fun deserialize(responseString: String): String? {
+    val p = Pattern.compile(".*?\\((.*)\\)$")
+    val m = p.matcher(responseString)
+    var json: String? = null
+    if (m.matches()) {
+        json = m.group(1)
+    }
+    return json
+}
+
+fun makeFavorites() {
+    fromDatabase = true
+    val db = App.instance.database
+    val imageDao = db?.imageDao()
+
+    favoritesList = imageDao?.getAll()
+    adapter_?.notifyDataSetChanged()
+}
+
+fun makeSearch(str: String) {
+    fromDatabase = false
+    userQuerty = str
+    NetworkService.instance
+            .jsonApi
+            .getPostWithFormat(userQuerty)
+            .enqueue(object : Callback<String> {
+                override fun onFailure(call: Call<String>?, t: Throwable?) {
+                    t?.printStackTrace()
+                }
+
+                override fun onResponse(call: Call<String>?, response: Response<String>?) {
+                    /**
+                     * Пришлось response принимать строкой, а потом её парсить в json.
+                     * Почему?
+                     * Мой API возвращат плохо отформатированную строку
+                     * => вот это вот не работало -> .addConverterFactory(GsonConverterFactory.create(gson))
+                     * А как добавить свой converter я не разобрался
+                     */
+                    val result = deserialize(response?.body()!!)
+                    val mapper = ObjectMapper()
+                    val json: JSONImages = mapper.readValue(result, JSONImages::class.java)
+                    JSONHolder().setJSON(json)
+                    adapter_?.notifyDataSetChanged()
+                }
+            })
+}
 
 fun RecyclerView.setupForUsers(ctx: Context, onItemClicked: (index: Int) -> Unit = {}) {
     layoutManager = LinearLayoutManager(ctx)
     adapter = UsersRecycler(context!!, onItemClicked)
+    adapter_ = adapter
     setHasFixedSize(true)
-
 }
 
 fun Context.createUserIntent(image: Images): Intent {
@@ -48,10 +108,35 @@ class UsersRecycler(private val ctx: Context, private val onItemClicked: (index:
                 frame.setOnClickListener { onItemClicked(adapterPosition) }
             }
 
-    override fun getItemCount() = 100
+    override fun getItemCount(): Int = if (fromDatabase) favoritesList?.size ?: 0
+    else
+        JSONHolder().get()?.photos?.photo?.size ?: 0
 
     override fun onBindViewHolder(holder: ImageViewHolder, index: Int) {
-        DownloadPreviewTask(holder).execute(index)
+        holder.image.setImageResource(R.drawable.ic_home_black_24dp)
+        setPreviewOnHolder(holder, index)
     }
 
+    private fun setPreviewOnHolder(holder: ImageViewHolder, index: Int) {
+        try {
+            val title: String?
+            val url: String?
+             if (!fromDatabase) {
+                 title = JSONHolder().get()?.photos?.photo?.get(index)?.title
+                 url = JSONHolder().get()?.photos?.photo?.get(index)?.urlS
+             } else {
+                 title = favoritesList?.get(index)?.title
+                 url = favoritesList?.get(index)?.urlS
+             }
+
+            holder.description.text = title
+            Picasso.with(ctx)
+                    .load(url)
+                    .placeholder(R.drawable.ic_home_black_24dp)
+                    .error(R.drawable.ic_home_black_24dp)
+                    .into(holder.image)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
