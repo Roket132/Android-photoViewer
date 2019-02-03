@@ -23,6 +23,7 @@ class DisplayImageActivity : AppCompatActivity(), FragmentWithText.FragmentWithT
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {
+                //todo менять здесь
                 navigateOther(2)
                 return@OnNavigationItemSelectedListener true
             }

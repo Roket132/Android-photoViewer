@@ -1,34 +1,25 @@
 package com.example.laletin.picturerbog
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.media.Image
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.android.synthetic.main.image_list_fragment.*
 import kotlinx.android.synthetic.main.image_list_fragment.view.*
-import android.os.AsyncTask
-import android.os.IBinder
-import android.support.v4.app.FragmentActivity
-import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import java.lang.ref.WeakReference
-
 
 class ImageList : Fragment() {
+
+    var querty: String = ""
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.image_list_fragment, container, false).also { inflatedView ->
         inflatedView.image_list_fragment.setupForUsers(context!!) { index ->
             try {
                 val title = JSONHolder().get()?.photos?.photo?.get(index)?.title
-                val urlL = JSONHolder().get()?.photos?.photo?.get(index)?.urlL
+                val urlL = JSONHolder().get()?.photos?.photo?.get(index)?.urlL?: JSONHolder().get()?.photos?.photo?.get(index)?.urlS
                 val image: Images = Images(index.toString(), title!!, urlL!!)
                 if (activity?.findViewById<View>(R.id.fragment_content) != null) {
                     val transaction = activity!!.supportFragmentManager.beginTransaction()
@@ -37,9 +28,21 @@ class ImageList : Fragment() {
                 } else {
                     startActivity(context!!.createUserIntent(image))
                 }
-            }catch (e : Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        textQuery.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                makeSearch(textQuery.text.toString())
+                return@OnKeyListener true
+            }
+            false
+        })
     }
 }

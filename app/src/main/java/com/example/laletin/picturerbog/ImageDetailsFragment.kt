@@ -37,8 +37,6 @@ class ImageDetailsFragment : Fragment() {
                 .placeholder(R.drawable.ic_home_black_24dp)
                 .error(R.drawable.ic_home_black_24dp)
                 .into(imageView)
-        /*val url_sImage = image?.url_l?.let { CacheImages.cache.getBitmapFromMemory(it) }
-        imageView.setImageBitmap(url_sImage)*/
     }
 
 

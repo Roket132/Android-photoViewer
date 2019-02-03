@@ -15,9 +15,6 @@ class NetworkService private constructor() {
         get() = mRetrofit.create<JSONFlickrHolderApi>(JSONFlickrHolderApi::class.java)
 
     init {
-        val gson = GsonBuilder()
-                .setLenient()
-                .create()
         mRetrofit = Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -26,7 +23,7 @@ class NetworkService private constructor() {
 
     companion object {
         private var mInstance: NetworkService? = null
-        private val BASE_URL = "https://api.flickr.com/services/rest/?safe_search=safe&api_key=4ed4d7bcac872286fa3687b953af1d42&sort=relevance&method=flickr.interestingness.getList&per_page=50&media=photos&extras=url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o&license=1,2,3,4,5,6&format=json"
+        private val BASE_URL = "https://api.flickr.com/services/"
 
         val instance: NetworkService
             get() {
